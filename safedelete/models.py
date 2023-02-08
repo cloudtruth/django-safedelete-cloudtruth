@@ -217,7 +217,9 @@ class SafeDeleteModel(models.Model):
         collector.collect([self])
         # Soft-delete-cascade raises an exception when trying to delete a object that related object is PROTECT
         protected_objects = defaultdict(list)
-        for obj in collector.protected:
+
+        # [CT-EDIT] filter out Ledger objects.
+        for obj in [o for o in collector.protected if not o.__class__.__name__.endswith("Ledger")]:
             if getattr(obj, FIELD_NAME, None) is None:
                 protected_objects[obj.__class__.__name__].append(obj)
         if protected_objects:
